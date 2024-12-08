@@ -1,0 +1,9 @@
+{
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/matthew/source/tardis/build",
+            "binaryPath": "/home/matthew/source/tardis/build/3d_billboards.elf",
+            "binaryArgs": []
+        }
+    ]
+}

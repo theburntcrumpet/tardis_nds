@@ -1,0 +1,105 @@
+// SPDX-License-Identifier: CC0-1.0
+//
+// SPDX-FileContributor: Antonio Niño Díaz, 2024
+
+// Billboards are 2D objects drawn in a 3D world that always face the camera.
+// For example, if you're drawing many spheres in a 3D environment, using 2D
+// circles as billboards to represent the spheres can save you a lot of polygons
+// and, depending on your situation, it won't look worse than drawing sphere
+// models all over the place.
+
+#include <nds.h>
+#include <math.h>
+
+#include "tardis_bin.h"
+#include "tardis_tex.h"
+
+int main(int argc, char **argv)
+{
+    glInit();
+    consoleDemoInit();
+
+    videoSetMode(MODE_0_3D);
+
+    glClearColor(0,0,0,0);
+
+    glClearPolyID(0);
+    glClearDepth(0x7FFF);
+
+
+    gluLookAt(0.0, 0.0, 8.0,  // Camera position
+              0.0, 0.0, 0.0,  // Look at
+              0.0, 1.0, 0.0); // Up
+
+    glLight(0, RGB15(31, 31, 31),
+            floattov10(0.58), floattov10(-0.58), floattov10(-0.58));
+
+    glViewport(0, 0, 255, 191);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60, 256.0 / 192.0, 0.1, 20);
+
+    glMatrixMode(GL_MODELVIEW);
+    glSetToonTableRange(0, 15, RGB15(0, 0, 8));
+    glSetToonTableRange(16, 31, RGB15(0, 0, 28));
+    glMaterialf(GL_AMBIENT, RGB15(8, 8, 8));
+    glMaterialf(GL_DIFFUSE, RGB15(28, 0, 0));
+    glMaterialf(GL_SPECULAR, RGB15(0, 0, 0));
+    glMaterialf(GL_EMISSION, RGB15(0, 0, 0));
+    printf("Dr Who 3D Demo\n");
+    printf("By crumpy - Just messin' around\n");
+    printf("Start: exit\n");
+    glEnable(GL_TEXTURE_2D);
+
+
+    int textureId;
+    // load textures
+    glGenTextures(1, &textureId);
+    glBindTexture(0, textureId);
+    if(glTexImage2D(0,0,GL_RGBA,256,256,0,TEXGEN_TEXCOORD,&tardis_texBitmap)){
+        printf("tex load failed\n");
+    }
+
+
+    s32 rotateX = 0;
+    s32 rotateY = 0;
+    u32 tick = 0;
+    const s32 radiusX =4000, radiusY = 4000; 
+
+    GLvector position = {0,0,0};
+    
+    while(1)
+    {
+        scanKeys();
+        u16 keys = keysHeld();
+        rotateY += 3 << 5;
+        rotateX = (sin(tick * M_PI / 180.0) * 30) * (100);
+        position.x = sin(tick * M_PI * 0.01) * radiusX;
+        position.y = cos(tick * M_PI * 0.01) * radiusY;
+
+        
+        glPolyFmt(POLY_ALPHA(31) | POLY_CULL_BACK | POLY_FORMAT_LIGHT0 |
+                      POLY_ID(0) | POLY_TOON_HIGHLIGHT);
+        glBindTexture(0, textureId);
+        glColor3f(1, 1, 1);
+        glPushMatrix();
+        {
+            glRotateXi(rotateX);
+            glRotateYi(rotateY);
+
+            glTranslatev(&position);
+            glCallList(tardis_bin);
+        }
+        glPopMatrix(1);
+        glFlush(0);
+        swiWaitForVBlank();
+        tick++;
+        if (keys & KEY_START)
+        {
+            break;
+        }
+    }
+
+
+    return 0;
+}

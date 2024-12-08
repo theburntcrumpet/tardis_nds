@@ -1,0 +1,12 @@
+# Blender 4.1.1 MTL File: 'tardis.blend'
+# www.blender.org
+
+newmtl Material
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.608772 0.608772 0.608772
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 0.505263
+illum 9
+map_Kd Documents/tardis.png
