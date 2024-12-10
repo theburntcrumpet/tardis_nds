@@ -91,7 +91,7 @@ int main(int argc, char **argv)
     glEnable(GL_ANTIALIAS);
     consoleDemoInit();
     soundEnable();
-    u8 volume = 0;
+    u8 volume = 64;
     soundPlaySample(theme_bin, SoundFormat_16Bit, theme_bin_size, 8000, volume, 64, true, 0);
     videoSetMode(MODE_0_3D);
 
