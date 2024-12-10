@@ -16,3 +16,9 @@ $OBJ2DL \
     --output data/tardis.bin \
     --texture 256 256 \
     --scale 1
+
+$OBJ2DL \
+    --input assets/test_cube.obj \
+    --output data/test_cube.bin \
+    --texture 128 128 \
+    --scale 1

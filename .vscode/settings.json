@@ -5,5 +5,8 @@
             "binaryPath": "/home/matthew/source/tardis/build/3d_billboards.elf",
             "binaryArgs": []
         }
-    ]
+    ],
+    "files.associations": {
+        "test_cube_bin.h": "c"
+    }
 }
