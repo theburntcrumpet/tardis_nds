@@ -5,6 +5,7 @@
 typedef struct s_entity {
     GLvector position;
     GLvector rotation;
+    GLvector renderScale;
     void * modelData;
     int modelDataSize;
     Texture * texture;

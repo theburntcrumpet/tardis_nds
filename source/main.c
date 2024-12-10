@@ -16,8 +16,8 @@
 
 #include "theme_bin.h"
 
-#include "test_cube_bin.h"
-#include "test_texture.h"
+#include "sky.h"
+#include "skybox_bin.h"
 
 #include "entity.h"
 
@@ -58,11 +58,13 @@ void DrawEntity(Entity *entity)
 
     glPushMatrix();
     {
-
+        glScalev(&entity->renderScale);
+        glTranslatev(&(entity->position));
+        
         glRotateXi(entity->rotation.x);
         glRotateYi(entity->rotation.y);
         glRotateZi(entity->rotation.z);
-        glTranslatev(&(entity->position));
+        
         glCallList(entity->modelData);
     }
 
@@ -78,6 +80,7 @@ Entity *CreateEntity(GLvector position, GLvector rotation, void *modelData, int 
     entity->modelData = modelData;
     entity->modelDataSize = modelDataSize;
     entity->texture = texture;
+    entity->renderScale = (GLvector){4000,4000,4000};
     return entity;
 }
 
@@ -113,11 +116,20 @@ int main(int argc, char **argv)
         (GLvector){256, 256, 0},
         (void *)tardis_texBitmap,
         tardis_texBitmapLen);
-
-    Texture *cubeTexture = CreateTexture(
+    
+    Texture *sky = CreateTexture(
         (GLvector){128, 128, 0},
-        (void *)test_textureBitmap,
-        test_textureBitmapLen);
+        (void *)skyBitmap,
+        skyBitmapLen);
+
+    Entity *skybox = CreateEntity(
+        (GLvector){0, 0, 0},
+        (GLvector){0, 0, 0},
+        (void *)skybox_bin,
+        skybox_bin_size,
+        sky);
+
+    skybox->renderScale = (GLvector){6000,6000,6000};
 
     Entity *tardis = CreateEntity(
         (GLvector){0, 0, 0},
@@ -126,21 +138,14 @@ int main(int argc, char **argv)
         tardis_bin_size,
         tardisTexture);
 
-    Entity *cube = CreateEntity(
+    Entity *tardis3 = CreateEntity(
+        (GLvector){0, 0, 10000},
         (GLvector){0, 0, 0},
-        (GLvector){0, 0, 0},
-        (void *)test_cube_bin,
-        test_cube_bin_size,
-        cubeTexture);
-
-    Entity *tardis2 = CreateEntity(
-        (GLvector){0, 0, -16000},
-        (GLvector){0, 0, 9000},
         (void *)tardis_bin,
         tardis_bin_size,
-        cubeTexture);
+        tardisTexture);
 
-    Entity *entities[] = {tardis, cube, tardis2};
+    Entity *entities[] = {skybox, tardis, tardis3};
     int entitiesSize = sizeof(entities) / sizeof(Entity *);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -152,7 +157,6 @@ int main(int argc, char **argv)
 
     u32 tick = 0;
     const s32 radiusX = 4000, radiusY = 4000;
-
     while (1)
     {
         swiWaitForVBlank();
@@ -162,10 +166,11 @@ int main(int argc, char **argv)
         tardis->rotation.x = (sin(tick * M_PI / 180.0) * 30) * (100);
         tardis->position.x = sin(tick * M_PI * 0.01) * radiusX;
         tardis->position.y = cos(tick * M_PI * 0.01) * radiusY;
-        cube->rotation.y -= 3 << 5;
-        cube->rotation.x = -(sin(tick * M_PI / 180.0) * 30) * (100);
-        cube->position.x = -(sin(tick * M_PI * 0.01) * (4 * radiusX));
-        cube->position.y = -(cos(tick * M_PI * 0.01) * (4 * radiusY));
+
+        tardis3->rotation.y += 3 << 5;
+        tardis3->rotation.x = (sin(10000 + tick * M_PI / 180.0) * 30) * (100);
+        tardis3->position.x = sin(10000 + tick * M_PI * 0.01) * (radiusX * 4);
+        tardis3->position.z = cos(10000 + tick * M_PI * 0.01) * (radiusY * 4);
 
         // draw entities
         for (int i = 0; i < entitiesSize; i++)
